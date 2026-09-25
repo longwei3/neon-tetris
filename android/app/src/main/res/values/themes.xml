@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      应用主题只负责启动窗口背景（避免冷启动白屏闪烁）。
+      真正的配色全部由 Compose 的 NeonTheme 控制。
+      刘海屏适配在 MainActivity 里按 API 等级设置，避免在 values/ 里用到高版本属性。
+    -->
+    <style name="Theme.NeonTetris" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/window_bg</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+</resources>

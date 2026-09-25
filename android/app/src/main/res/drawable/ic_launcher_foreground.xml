@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  启动图标前景：四块霓虹方块。
+  自适应图标画布为 108x108，安全区是居中的 72x72（即 18..90）。
+  方块组 32..76，正好落在安全区内。
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- 左上：青 -->
+    <path
+        android:fillColor="#22D3EE"
+        android:pathData="M36,32 h14 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-14 a4,4 0 0 1 -4,-4 v-14 a4,4 0 0 1 4,-4 z" />
+    <!-- 右上：紫 -->
+    <path
+        android:fillColor="#A855F7"
+        android:pathData="M58,32 h14 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-14 a4,4 0 0 1 -4,-4 v-14 a4,4 0 0 1 4,-4 z" />
+    <!-- 左下：绿 -->
+    <path
+        android:fillColor="#22C55E"
+        android:pathData="M36,54 h14 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-14 a4,4 0 0 1 -4,-4 v-14 a4,4 0 0 1 4,-4 z" />
+    <!-- 右下：琥珀 -->
+    <path
+        android:fillColor="#F59E0B"
+        android:pathData="M58,54 h14 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-14 a4,4 0 0 1 -4,-4 v-14 a4,4 0 0 1 4,-4 z" />
+</vector>

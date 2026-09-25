@@ -1,0 +1,33 @@
+# macOS
+.DS_Store
+
+# 安卓构建产物（不作为源码提交；要分发 APK 请用 GitHub Releases）
+android/build/
+android/app/build/
+android/dist/
+android/.gradle/
+android/.kotlin/
+android/captures/
+android/.cxx/
+android/.externalNativeBuild/
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# 机器相关配置，含本机 SDK 路径，绝不能提交
+android/local.properties
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Gradle
+.gradle/
+
+# 杂项
+*.log
+*.hprof
