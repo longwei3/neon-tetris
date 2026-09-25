@@ -14,19 +14,21 @@ import com.neon.tetris.game.Piece
  * 方块颜色取高亮度高饱和的色相，叠上辉光后互相映照，避免整屏发闷。
  */
 object Neon {
-    // 背景与棋盘
-    val BgTop = Color(0xFF16213F)
-    val BgDeep = Color(0xFF05060C)
-    val BoardTop = Color(0xFF121D3A)
-    val BoardBottom = Color(0xFF06090F)
-    val GridLine = Color(0xFF3B82F6)
+    // 背景与棋盘。
+    // 这几个值刻意比「近黑」亮一档：屏幕大部分面积是它们，压太暗的话
+    // 即使方块很鲜艳，整体第一眼仍然是灰暗的。
+    val BgTop = Color(0xFF1E2E60)
+    val BgDeep = Color(0xFF0B1024)
+    val BoardTop = Color(0xFF24376F)
+    val BoardBottom = Color(0xFF141D45)
+    val GridLine = Color(0xFF7BA4FF)
 
     // 面板
     val PanelTop = Color(0x1AFFFFFF)
     val PanelBottom = Color(0x08FFFFFF)
     val Border = Color(0x24FFFFFF)
-    val TextPrimary = Color(0xFFEDF1FA)
-    val TextMuted = Color(0xFF8894B4)
+    val TextPrimary = Color(0xFFF2F5FC)
+    val TextMuted = Color(0xFF98A6C8)
 
     // 霓虹主色
     val Cyan = Color(0xFF22D3EE)

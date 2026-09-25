@@ -139,6 +139,8 @@ fun GameScreen(vm: GameViewModel = viewModel()) {
                     .fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
+                // 棋盘背光：让深色棋盘从深色背景里浮起来
+                Canvas(Modifier.fillMaxSize()) { drawBoardHalo() }
                 BoardView(vm)
             }
             Spacer(Modifier.height(8.dp))
@@ -219,10 +221,10 @@ private fun Chip(onClick: () -> Unit, content: @Composable () -> Unit) {
             .clip(shape)
             .background(
                 Brush.verticalGradient(
-                    listOf(Color.White.copy(alpha = 0.13f), Color.White.copy(alpha = 0.05f))
+                    listOf(Neon.Blue.copy(alpha = 0.34f), Neon.Purple.copy(alpha = 0.16f))
                 )
             )
-            .border(1.dp, Neon.Border, shape)
+            .border(1.dp, Neon.GridLine.copy(alpha = 0.38f), shape)
             .clickable(onClick = onClick)
             .padding(horizontal = 9.dp, vertical = 5.dp),
         contentAlignment = Alignment.Center
@@ -323,10 +325,10 @@ private fun PanelBox(
             .clip(shape)
             .background(
                 Brush.verticalGradient(
-                    listOf(tint.copy(alpha = 0.18f), Color.White.copy(alpha = 0.03f))
+                    listOf(tint.copy(alpha = 0.32f), Color.White.copy(alpha = 0.05f))
                 )
             )
-            .border(1.dp, tint.copy(alpha = 0.32f), shape)
+            .border(1.dp, tint.copy(alpha = 0.50f), shape)
             .padding(horizontal = 6.dp, vertical = 5.dp),
         content = content
     )
@@ -488,8 +490,12 @@ private fun PadButton(
         modifier
             .height(56.dp)
             .clip(shape)
-            .background(Color.White.copy(alpha = 0.06f))
-            .border(1.dp, Neon.Border, shape)
+            .background(
+                Brush.verticalGradient(
+                    listOf(Neon.Blue.copy(alpha = 0.26f), Neon.Purple.copy(alpha = 0.12f))
+                )
+            )
+            .border(1.dp, Neon.GridLine.copy(alpha = 0.30f), shape)
             .pointerInput(Unit) {
                 detectTapGestures(
                     onPress = {

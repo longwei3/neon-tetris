@@ -20,13 +20,14 @@ import com.neon.tetris.game.Pieces
 private fun Color.lighten(f: Float): Color = lerp(this, Color.White, f)
 private fun Color.darken(f: Float): Color = lerp(this, Color.Black, f)
 
-/** 幽灵方块的不透明度。 */
-private const val GHOST_ALPHA = 0.34f
+/** 幽灵方块的不透明度。棋盘底色变亮后要相应提高，否则看不清落点。 */
+private const val GHOST_ALPHA = 0.42f
 
 /**
  * 整个页面的氛围背景：深靛蓝底 + 三处彩色光晕。
  *
  * 这层不读任何状态，只在首次布局与尺寸变化时绘制一次，不参与每帧重绘。
+ * 光晕给得比较重是有意的 —— 底色本身偏暗，靠这几层彩光撑起整体的色彩感。
  */
 fun DrawScope.drawAmbientBackground() {
     val w = size.width
@@ -37,25 +38,53 @@ fun DrawScope.drawAmbientBackground() {
     // 左上青色光晕
     drawRect(
         Brush.radialGradient(
-            colors = listOf(Neon.Cyan.copy(alpha = 0.22f), Color.Transparent),
-            center = Offset(w * 0.12f, h * 0.0f),
-            radius = w * 1.05f
+            colors = listOf(Neon.Cyan.copy(alpha = 0.42f), Color.Transparent),
+            center = Offset(w * 0.10f, h * -0.02f),
+            radius = w * 1.15f
         )
     )
     // 右下紫色光晕
     drawRect(
         Brush.radialGradient(
-            colors = listOf(Neon.Purple.copy(alpha = 0.24f), Color.Transparent),
-            center = Offset(w * 0.92f, h * 0.78f),
-            radius = w * 1.15f
+            colors = listOf(Neon.Purple.copy(alpha = 0.48f), Color.Transparent),
+            center = Offset(w * 0.94f, h * 0.80f),
+            radius = w * 1.25f
         )
     )
-    // 左下品红，补一点暖色避免整屏偏冷
+    // 左下品红，补暖色避免整屏偏冷
     drawRect(
         Brush.radialGradient(
-            colors = listOf(Neon.Pink.copy(alpha = 0.15f), Color.Transparent),
-            center = Offset(w * 0.02f, h * 1.0f),
+            colors = listOf(Neon.Pink.copy(alpha = 0.30f), Color.Transparent),
+            center = Offset(w * 0.0f, h * 1.02f),
+            radius = w * 1.05f
+        )
+    )
+    // 右上再来一层蓝色，让四个角都有颜色
+    drawRect(
+        Brush.radialGradient(
+            colors = listOf(Neon.Blue.copy(alpha = 0.26f), Color.Transparent),
+            center = Offset(w * 1.0f, h * 0.08f),
             radius = w * 0.95f
+        )
+    )
+}
+
+/**
+ * 棋盘背后的光晕。
+ *
+ * 画在棋盘外面（父容器尺寸），所以不会被棋盘的圆角裁掉 ——
+ * 作用是让深色棋盘从同样是深色的背景里「浮」起来，而不是糊成一片。
+ */
+fun DrawScope.drawBoardHalo() {
+    drawRect(
+        Brush.radialGradient(
+            colors = listOf(
+                Neon.Cyan.copy(alpha = 0.22f),
+                Neon.Purple.copy(alpha = 0.14f),
+                Color.Transparent
+            ),
+            center = Offset(size.width / 2f, size.height / 2f),
+            radius = size.height * 0.45f
         )
     )
 }
@@ -146,7 +175,7 @@ fun DrawScope.drawBoard(engine: GameEngine) {
 
     drawRect(Brush.verticalGradient(listOf(Neon.BoardTop, Neon.BoardBottom)))
 
-    val gridColor = Neon.GridLine.copy(alpha = 0.13f)
+    val gridColor = Neon.GridLine.copy(alpha = 0.20f)
     for (x in 1 until cols) {
         val px = x * cell
         drawLine(gridColor, Offset(px, 0f), Offset(px, h), strokeWidth = 1f)
@@ -220,7 +249,7 @@ fun DrawScope.drawBoard(engine: GameEngine) {
 
     // 霓虹边框：多层由外向内递减的描边，模拟从边缘内散的光晕
     val corner = w * 0.06f
-    val rim = listOf(0.6f to 0.75f, 2.6f to 0.30f, 5.5f to 0.16f, 9.5f to 0.07f)
+    val rim = listOf(0.6f to 0.95f, 2.6f to 0.42f, 5.5f to 0.22f, 9.5f to 0.10f)
     for ((inset, a) in rim) {
         val cr = (corner - inset * 0.8f).coerceAtLeast(0f)
         drawRoundRect(
