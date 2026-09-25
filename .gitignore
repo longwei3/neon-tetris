@@ -31,3 +31,6 @@ out/
 # 杂项
 *.log
 *.hprof
+
+# 背景音乐试听文件（由 BgmSynthTest 导出，可用 ./gradlew testDebugUnitTest 重新生成）
+bgm-preview.wav

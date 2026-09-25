@@ -49,11 +49,15 @@
 
 详见 [`android/README.md`](android/README.md)。
 
+**音频全部运行时合成，APK 里没有任何 wav/ogg。** 9 个操作音效之外，还有一首原创 synthwave
+背景音乐：速度随等级从 96 BPM 提到 176 BPM，编曲也随等级分层解锁（4 级进主旋律、8 级加厚琶音），
+所以同一段循环在游戏不同阶段听起来是不同的。
+
 ```bash
 cd android
 ./gradlew assembleDebug        # 产物在 app/build/outputs/apk/debug/
 ./gradlew installDebug         # 连上手机直接装
-./gradlew testDebugUnitTest    # 31 个规则回归测试
+./gradlew testDebugUnitTest    # 41 个单元测试
 ```
 
 要求 JDK 17+、Android SDK Platform 34、Build-Tools 34.0.0。
@@ -84,6 +88,7 @@ SDK 路径写在 `android/local.properties`（机器相关，未纳入版本控�
 ```
 GameEngineTest       22 个   随机器 / SRS 踢墙 / 消行计分 / T-spin / 锁定延迟 …
 GamePresenterTest     9 个   帧循环与状态同步（含一个真机才暴露的 bug 的回归）
+BgmSynthTest         10 个   背景音乐合成本身（电平、削波、分层、可复现），并导出试听 WAV
 ```
 
 ## License

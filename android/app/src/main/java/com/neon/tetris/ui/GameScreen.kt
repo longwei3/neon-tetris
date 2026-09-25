@@ -55,6 +55,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.neon.tetris.Bgm
 import com.neon.tetris.Haptics
 import com.neon.tetris.Sfx
 import com.neon.tetris.game.GameEngine
@@ -66,15 +67,27 @@ import kotlin.math.abs
 fun GameScreen(vm: GameViewModel = viewModel()) {
     val context = LocalContext.current
     val sfx = remember { Sfx() }
+    val bgm = remember { Bgm() }
     val haptics = remember { Haptics(context) }
 
     // 开关状态同步到底层
     LaunchedEffect(vm.soundOn) { sfx.enabled = vm.soundOn }
     LaunchedEffect(vm.hapticsOn) { haptics.enabled = vm.hapticsOn }
 
+    // 背景音乐只在游戏进行中播放；暂停与结束时停掉，免得盖过结束音效
+    LaunchedEffect(vm.phase, vm.soundOn) {
+        if (vm.soundOn && vm.phase == Phase.RUNNING) bgm.start() else bgm.stop()
+    }
+
+    // 等级变化会同时改变速度与编曲层数
+    LaunchedEffect(vm.level) { bgm.setLevel(vm.level) }
+
     // 离开界面时释放 AudioTrack
     DisposableEffect(Unit) {
-        onDispose { sfx.release() }
+        onDispose {
+            sfx.release()
+            bgm.release()
+        }
     }
 
     // 切到后台自动暂停，回来时玩家自己点继续

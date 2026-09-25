@@ -117,6 +117,40 @@ T-spin 三角规则（正例与反例）、Hold 交换与限制、锁定延迟�
 `GamePresenterTest`（9 个）：硬降/暂存在 tick 之外结束游戏时状态必须同步、
 结束只播报一次、状态切换触发重绘、暂停后不空转重绘、重开后能再次播报。
 
+## 音频
+
+**APK 里没有任何音频资源文件**，音效和音乐都是运行时合成 PCM。
+
+### 音效
+
+9 个一次性音效（[`Sfx.kt`](app/src/main/java/com/neon/tetris/Sfx.kt)），用方波/三角波/锯齿波加指数衰减
+包络合成，写进静态 `AudioTrack`。移动音效做了 45ms 节流，否则连发时会糊成一片。
+
+### 背景音乐
+
+一首原创 synthwave / 芯片风格循环（[`BgmSynth.kt`](app/src/main/java/com/neon/tetris/BgmSynth.kt)），
+Am - F - C - G 四小节，六层织体：底鼓、军鼓、踩镲、锯齿贝斯、方波琶音、三角波主旋律。
+
+针对「循环到腻」做了三件事：
+
+1. **速度随等级提升** —— 96 BPM 起，每级 +7，封顶 176；
+2. **编曲分层解锁** —— 4 级进主旋律，8 级琶音加倍，等级越高织体越厚；
+3. **第四小节末尾加鼓花** —— 让循环接缝不那么规整。
+
+播放用流式 `AudioTrack`（而不是静态缓冲），这样每一步都能按当前等级重新计算 16 分音符时长。
+游戏暂停或结束时音乐停止，免得盖过结束音效。
+
+### 试听与测试
+
+作曲和合成逻辑被拆成不依赖 Android 的 `BgmSynth`，所以可以在 JVM 上直接渲染：
+
+```bash
+./gradlew testDebugUnitTest --tests 'com.neon.tetris.BgmSynthTest'
+# 会导出 app/build/bgm-preview.wav —— 同一首曲子在 1 / 4 / 9 级各放一圈
+```
+
+测试会断言电平合理（不是静音、不削波、无直流偏置）、分层确实生效、同种子可复现。
+
 ## 真机验证记录
 
 在 Xiaomi M2012K11C（Android 14 / arm64-v8a）上通过 adb 实测：
@@ -125,6 +159,9 @@ T-spin 三角规则（正例与反例）、Hold 交换与限制、锁定延迟�
 - 分数结算、最高分持久化（SharedPreferences）跨重启有效
 - 轻点旋转、左右拖动横移、下滑硬降、长按连发（DAS）均用截图 + 像素分析逐项验证
 - 游戏结束遮罩能自动出现，显示「新纪录！」或「最高分 N」
+- 背景音乐经过系统层确认：`dumpsys audio` 中本应用有 `content=CONTENT_TYPE_MUSIC`、
+  `state:started`、`sampleRate=44100`、单声道的活跃音轨；暂停 → 停止、恢复 → 重新播放的循环
+  连续验证三轮均正确
 
 ## 已知限制
 
