@@ -43,47 +43,63 @@ class BgmSynthTest {
 
     @Test
     fun `速度随等级提升并封顶`() {
-        assertEquals(96.0, BgmSynth.bpmForLevel(1), 0.001)
-        assertEquals(117.0, BgmSynth.bpmForLevel(4), 0.001)
-        assertEquals(173.0, BgmSynth.bpmForLevel(12), 0.001)
-        // 13 级算出 180，被上限压到 176
-        assertEquals("超过上限后应被压到 176", 176.0, BgmSynth.bpmForLevel(13), 0.001)
-        assertEquals("满级同样封顶", 176.0, BgmSynth.bpmForLevel(15), 0.001)
-        assertEquals("等级 0 或负数按 1 级处理", 96.0, BgmSynth.bpmForLevel(0), 0.001)
+        assertEquals(70.0, BgmSynth.bpmForLevel(1), 0.001)
+        assertEquals(79.0, BgmSynth.bpmForLevel(4), 0.001)
+        assertEquals(103.0, BgmSynth.bpmForLevel(12), 0.001)
+        // 15 级算出 112，被上限压到 110
+        assertEquals("超过上限后应被压到 110", 110.0, BgmSynth.bpmForLevel(15), 0.001)
+        assertEquals("等级 0 或负数按 1 级处理", 70.0, BgmSynth.bpmForLevel(0), 0.001)
     }
 
     @Test
     fun `等级越高每步采样数越少`() {
         val slow = BgmSynth.stepSamplesFor(1)
         val fast = BgmSynth.stepSamplesFor(9)
-        assertTrue("等级高时 16 分音符应更短", fast < slow)
-        // 96 BPM 的 16 分音符 = 0.15625s
-        assertEquals(6890, slow)
+        assertTrue("等级高时八分音符应更短", fast < slow)
+        // 70 BPM 的八分音符 = 0.4286s
+        assertEquals(18900, slow)
         assertTrue("不得超过缓冲上限", slow <= BgmSynth.MAX_STEP_SAMPLES)
     }
 
     // ------------------------------------------------------------ 分层解锁
 
     @Test
-    fun `主旋律与双琶音按等级解锁`() {
-        assertFalse(BgmSynth.hasLead(1))
-        assertFalse(BgmSynth.hasLead(3))
-        assertTrue(BgmSynth.hasLead(4))
+    fun `对位旋律与泛音层按等级解锁`() {
+        assertFalse(BgmSynth.hasCounterMelody(1))
+        assertFalse(BgmSynth.hasCounterMelody(3))
+        assertTrue(BgmSynth.hasCounterMelody(4))
 
-        assertFalse(BgmSynth.hasDoubleArp(7))
-        assertTrue(BgmSynth.hasDoubleArp(8))
+        assertFalse(BgmSynth.hasShimmer(7))
+        assertTrue(BgmSynth.hasShimmer(8))
     }
 
     @Test
-    fun `高等级织体能量高于低等级`() {
-        val low = BgmSynth(seed = 20260925L)
-        val high = BgmSynth(seed = 20260925L)
-        val lowRms = rms(low.renderLoop(1))
-        val highRms = rms(high.renderLoop(6))
-        assertTrue(
-            "6 级加了主旋律层，能量应更高（1 级 $lowRms vs 6 级 $highRms）",
-            highRms > lowRms
-        )
+    fun `编曲随等级变厚`() {
+        // 直接比较渲染后的 RMS 会被速度变化干扰（等级高时循环更短、包络更紧凑），
+        // 所以先用声音数量判断分层是否真的加上了。
+        val l1 = BgmSynth(0L).voiceCountFor(1)
+        val l4 = BgmSynth(0L).voiceCountFor(4)
+        val l8 = BgmSynth(0L).voiceCountFor(8)
+        assertTrue("4 级应加入对位旋律（1 级 $l1 -> 4 级 $l4）", l4 > l1)
+        assertTrue("8 级应再加入泛音层（4 级 $l4 -> 8 级 $l8）", l8 > l4)
+
+        // 光有层还不够 —— 曾经出现过「层加上了但振幅太小、实际听不见」的情况，
+        // 所以再断言渲染出来的能量确实随之上升。
+        val low = rms(BgmSynth(seed = 1L).renderLoop(1))
+        val mid = rms(BgmSynth(seed = 1L).renderLoop(4))
+        val high = rms(BgmSynth(seed = 1L).renderLoop(8))
+        assertTrue("4 级能量应高于 1 级（$low vs $mid）", mid > low)
+        assertTrue("8 级能量应高于 4 级（$mid vs $high）", high > mid)
+    }
+
+    @Test
+    fun `各等级电平都在合理区间`() {
+        for (lv in intArrayOf(1, 4, 8, 15)) {
+            val loop = BgmSynth(seed = 7L).renderLoop(lv)
+            val level = rms(loop)
+            assertTrue("$lv 级不应是静音，RMS=$level", level > 0.02)
+            assertTrue("$lv 级电平不应过高，RMS=$level", level < 0.45)
+        }
     }
 
     // ------------------------------------------------------------ 输出质量
