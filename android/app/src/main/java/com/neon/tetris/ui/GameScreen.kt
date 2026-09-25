@@ -436,30 +436,38 @@ private fun BoardView(vm: GameViewModel) {
 private fun ControlPad(vm: GameViewModel) {
     val engine = vm.engine
 
+    // 按功能分组上色，比六个各不相同的颜色更好认：
+    // 暂存 = 薰衣草，旋转 = 薄荷，移动 = 天蓝，软降 = 蜜桃
     Column {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            PadButton("H", Modifier.weight(1f), caption = "暂存") { engine.hold() }
-            PadButton("⟲", Modifier.weight(1f), caption = "左旋") { engine.rotate(-1) }
-            PadButton("⟳", Modifier.weight(1f), caption = "右旋") { engine.rotate(1) }
+            PadButton(
+                label = "H", modifier = Modifier.weight(1f),
+                caption = "暂存", tint = Neon.MacaronLavender
+            ) { engine.hold() }
+            PadButton(
+                label = "⟲", modifier = Modifier.weight(1f),
+                caption = "左旋", tint = Neon.MacaronMint
+            ) { engine.rotate(-1) }
+            PadButton(
+                label = "⟳", modifier = Modifier.weight(1f),
+                caption = "右旋", tint = Neon.MacaronMint
+            ) { engine.rotate(1) }
         }
         Spacer(Modifier.height(8.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             PadButton(
-                label = "←",
-                modifier = Modifier.weight(1f).height(62.dp),
-                caption = "左移",
+                label = "←", modifier = Modifier.weight(1f).height(62.dp),
+                caption = "左移", tint = Neon.MacaronSky,
                 onUp = { engine.setHeldDirection(0) }
             ) { engine.setHeldDirection(-1) }
             PadButton(
-                label = "↓",
-                modifier = Modifier.weight(1f).height(62.dp),
-                caption = "软降",
+                label = "↓", modifier = Modifier.weight(1f).height(62.dp),
+                caption = "软降", tint = Neon.MacaronPeach,
                 onUp = { engine.setSoftDrop(false) }
             ) { engine.setSoftDrop(true) }
             PadButton(
-                label = "→",
-                modifier = Modifier.weight(1f).height(62.dp),
-                caption = "右移",
+                label = "→", modifier = Modifier.weight(1f).height(62.dp),
+                caption = "右移", tint = Neon.MacaronSky,
                 onUp = { engine.setHeldDirection(0) }
             ) { engine.setHeldDirection(1) }
         }
@@ -472,30 +480,30 @@ private fun ControlPad(vm: GameViewModel) {
  * 因此长时间按住不会产生协程或事件风暴。
  *
  * [onDown] 放在最后一个参数，这样调用处可以直接写尾部 lambda。
- * [caption] 是按钮下方的小字说明：图形本身表意不够明确。
  *
- * 硬降没有按钮，只保留棋盘上的「下滑」手势 —— 它是一次性动作，放在按键盘里
- * 既容易和「软降」混淆，也占掉一个位置。
+ * 外观上刻意和方块区分：
+ *  - **胶囊形**（方块是圆角方块）；
+ *  - **纯色哑光**，没有渐变、高光、辉光（方块这三样都有）；
+ *  - 底色是低饱和马卡龙，配深色墨字（方块是高饱和，配白色高光）。
+ *
+ * 硬降没有按钮，只保留棋盘上的「下滑」手势。
  */
 @Composable
 private fun PadButton(
     label: String,
     modifier: Modifier = Modifier,
     caption: String? = null,
+    tint: Color = Neon.MacaronLavender,
     onUp: () -> Unit = {},
     onDown: () -> Unit
 ) {
-    val shape = RoundedCornerShape(14.dp)
+    val shape = RoundedCornerShape(percent = 50)
     Box(
         modifier
             .height(56.dp)
             .clip(shape)
-            .background(
-                Brush.verticalGradient(
-                    listOf(Neon.Blue.copy(alpha = 0.26f), Neon.Purple.copy(alpha = 0.12f))
-                )
-            )
-            .border(1.dp, Neon.GridLine.copy(alpha = 0.30f), shape)
+            .background(tint)
+            .border(1.dp, tint.darken(0.22f), shape)
             .pointerInput(Unit) {
                 detectTapGestures(
                     onPress = {
@@ -510,14 +518,18 @@ private fun PadButton(
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = label,
-                style = TextStyle(fontSize = 20.sp, color = Neon.TextPrimary)
+                style = TextStyle(
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Neon.MacaronInk
+                )
             )
             if (caption != null) {
                 Text(
                     text = caption,
                     style = TextStyle(
                         fontSize = 9.sp,
-                        color = Neon.TextMuted,
+                        color = Neon.MacaronInk.copy(alpha = 0.66f),
                         letterSpacing = 1.sp
                     )
                 )

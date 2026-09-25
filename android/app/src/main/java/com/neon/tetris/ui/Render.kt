@@ -7,7 +7,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.lerp
 import com.neon.tetris.game.GameEngine
 import com.neon.tetris.game.Piece
 import com.neon.tetris.game.Pieces
@@ -15,10 +14,9 @@ import com.neon.tetris.game.Pieces
 /**
  * 全部绘制逻辑。走 [DrawScope] 直绘，不生成任何组合项，
  * 因此每帧重绘的代价只有 GPU 光栅化，没有重组开销。
+ *
+ * 颜色工具 [lighten] / [darken] 定义在 Theme.kt，供本文件与界面共用。
  */
-
-private fun Color.lighten(f: Float): Color = lerp(this, Color.White, f)
-private fun Color.darken(f: Float): Color = lerp(this, Color.Black, f)
 
 /** 幽灵方块的不透明度。棋盘底色变亮后要相应提高，否则看不清落点。 */
 private const val GHOST_ALPHA = 0.42f

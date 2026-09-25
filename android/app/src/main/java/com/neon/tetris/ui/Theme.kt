@@ -5,6 +5,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import com.neon.tetris.game.Piece
 
 /**
@@ -40,9 +41,30 @@ object Neon {
     val Red = Color(0xFFFB7185)
     val Yellow = Color(0xFFFDE047)
 
+    // 马卡龙色系：高明度、**低饱和**的奶油质感。
+    //
+    // 色相刻意和方块有重叠（薰衣草对紫 T、薄荷对绿 S、天蓝对蓝 J、蜜桃对橙 L），
+    // 但靠两点和方块区分开：
+    //   1. 饱和度低得多 —— 方块是高饱和 + 亮面渐变 + 辉光，这里是纯色哑光；
+    //   2. 形状是胶囊，方块是圆角方块。
+    // 这样色相虽然相邻，一眼看过去仍是「界面控件」而不是「游戏棋子」。
+    val MacaronLavender = Color(0xFFE4DAF7)
+    val MacaronMint = Color(0xFFCDEEDC)
+    val MacaronSky = Color(0xFFCFE3F7)
+    val MacaronPeach = Color(0xFFFBE0C8)
+
+    /** 马卡龙底色上的深色墨，保证对比度。 */
+    val MacaronInk = Color(0xFF2B2450)
+
     /** 标题与主按钮的高光渐变。 */
     val title = Brush.linearGradient(listOf(Cyan, Purple, Pink))
 }
+
+/** 向白色靠拢。 */
+internal fun Color.lighten(fraction: Float): Color = lerp(this, Color.White, fraction)
+
+/** 向黑色靠拢。 */
+internal fun Color.darken(fraction: Float): Color = lerp(this, Color.Black, fraction)
 
 /** 方块序号（Piece.ordinal）到颜色。取亮色系，叠辉光后更「霓虹」。 */
 fun pieceColor(ordinal: Int): Color = when (ordinal) {
