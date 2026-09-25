@@ -5,6 +5,11 @@ UI 全部走 Compose Canvas 直绘。
 
 ![游戏画面](screenshots/gameplay.png)
 
+> **棋盘是 12 列 × 20 行**（标准俄罗斯方块为 10 列）。
+> 竖屏手机上 10 列只能占到屏幕宽度的 75%，两侧各空出 1.7 格；12 列正好填满（90%）。
+> 单格尺寸不变（由棋盘高度决定），纯粹是多了两列。
+> 代价是每行要多凑两格才消，整体难度低于标准规则。
+
 ## 直接安装
 
 `dist/` 下有两个已签名的 APK：
@@ -68,8 +73,7 @@ SDK 路径写在 `local.properties`（与本机相关，未纳入版本控制）
 ## 架构
 
 ```
-app/src/main/java/com/neon/tetris/
-├── game/
+app/src/main/java/com/neon/tetris/├── game/
 │   ├── Pieces.kt          SRS 方块定义 + 踢墙表（扁平 IntArray，零分配）
 │   ├── GameEngine.kt      纯 Kotlin 规则内核，无 Android 依赖
 │   └── GamePresenter.kt   帧循环 + 状态同步，纯 Kotlin，可单元测试

@@ -27,7 +27,12 @@ private enum class Action { SPAWN, MOVE, ROTATE }
 class GameEngine(private val random: Random = Random.Default) {
 
     companion object {
-        const val COLS = 10
+        /**
+         * 列数。标准俄罗斯方块是 10 列，这里是 12 列 —— 手机竖屏下 10 列会让棋盘
+         * 只占屏幕宽度的 75%，两侧各空出 1.7 格；12 列正好填满，方块也更好看清。
+         * 代价是每行要多凑两格，整体难度低于标准规则。
+         */
+        const val COLS = 12
         const val ROWS = 20
 
         /** 顶部缓冲区行数：方块在此生成，不显示。保留它可避免生成瞬间越界。 */

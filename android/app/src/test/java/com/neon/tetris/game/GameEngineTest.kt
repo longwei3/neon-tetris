@@ -25,6 +25,21 @@ class GameEngineTest {
 
     private val bottomRow = GameEngine.TOTAL_ROWS - 1
 
+    /**
+     * 在底行留出一个刚好容下 O 方块的缺口，其余列填满，返回缺口左列的列号。
+     *
+     * 缺口位置从当前出生列推导，而不是写死列号 —— 这样调整 [GameEngine.COLS] 时
+     * 不需要跟着改测试。
+     */
+    private fun fillBottomRowLeavingGapForO(e: GameEngine): Int {
+        e.spawnPiece(Piece.O)
+        val left = e.current!!.x + 1 // O 在 3 格宽的包围盒里占第 1、2 列
+        for (x in 0 until GameEngine.COLS) {
+            if (x != left && x != left + 1) e.setCell(x, bottomRow, Piece.I)
+        }
+        return left
+    }
+
     // ------------------------------------------------------------ 随机器
 
     @Test
@@ -70,12 +85,13 @@ class GameEngineTest {
     fun `硬降后方块停在底部`() {
         val e = engine()
         e.spawnPiece(Piece.O)
+        val left = e.current!!.x + 1
         e.hardDrop()
 
-        assertEquals(Piece.O, e.cellAt(4, bottomRow))
-        assertEquals(Piece.O, e.cellAt(5, bottomRow))
-        assertEquals(Piece.O, e.cellAt(4, bottomRow - 1))
-        assertEquals(Piece.O, e.cellAt(5, bottomRow - 1))
+        assertEquals(Piece.O, e.cellAt(left, bottomRow))
+        assertEquals(Piece.O, e.cellAt(left + 1, bottomRow))
+        assertEquals(Piece.O, e.cellAt(left, bottomRow - 1))
+        assertEquals(Piece.O, e.cellAt(left + 1, bottomRow - 1))
     }
 
     @Test
@@ -131,11 +147,7 @@ class GameEngineTest {
     @Test
     fun `消掉一行后计分并移除该行`() {
         val e = engine()
-        // 底行只留第 4、5 列
-        for (x in 0 until GameEngine.COLS) {
-            if (x != 4 && x != 5) e.setCell(x, bottomRow, Piece.I)
-        }
-        e.spawnPiece(Piece.O)
+        val left = fillBottomRowLeavingGapForO(e)
         e.hardDrop()
 
         assertFalse("锁定后应进入消行动画", e.clearingRows.isEmpty())
@@ -147,18 +159,15 @@ class GameEngineTest {
         // 硬降 18 格 = 36 分，单行消除 = 100 分
         assertEquals(136, e.score)
         // 上半截 O 随之上移一行落到底
-        assertEquals(Piece.O, e.cellAt(4, bottomRow))
-        assertEquals(Piece.O, e.cellAt(5, bottomRow))
+        assertEquals(Piece.O, e.cellAt(left, bottomRow))
+        assertEquals(Piece.O, e.cellAt(left + 1, bottomRow))
     }
 
     @Test
     fun `连击计数随连续消行累加`() {
         val e = engine()
         repeat(2) {
-            for (x in 0 until GameEngine.COLS) {
-                if (x != 4 && x != 5) e.setCell(x, bottomRow, Piece.I)
-            }
-            e.spawnPiece(Piece.O)
+            fillBottomRowLeavingGapForO(e)
             e.hardDrop()
             e.update(GameEngine.CLEAR_MS + 1)
         }
@@ -170,10 +179,7 @@ class GameEngineTest {
     fun `每十行提升一级`() {
         val e = engine()
         repeat(10) {
-            for (x in 0 until GameEngine.COLS) {
-                if (x != 4 && x != 5) e.setCell(x, bottomRow, Piece.I)
-            }
-            e.spawnPiece(Piece.O)
+            fillBottomRowLeavingGapForO(e)
             e.hardDrop()
             e.update(GameEngine.CLEAR_MS + 1)
         }
