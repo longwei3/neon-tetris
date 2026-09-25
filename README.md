@@ -9,6 +9,8 @@
 
 两版共用同一套规则设计（SRS 旋转、T-spin、Back-to-Back），但代码各自独立。
 
+**在线试玩：<https://longwei3.github.io/neon-tetris/>**
+
 ![安卓版游戏画面](android/screenshots/gameplay.png)
 
 ## 玩法特性
@@ -25,9 +27,10 @@
 
 ## 网页版
 
-直接用浏览器打开 [`index.html`](index.html)，不需要安装任何东西。
+**在线玩：<https://longwei3.github.io/neon-tetris/>**
 
-如果启用 GitHub Pages，`https://<用户名>.github.io/<仓库名>/` 就能直接在线玩。
+也可以直接用浏览器打开 [`index.html`](index.html)，不需要安装任何东西。
+整个游戏就是一个文件，无外部依赖、无构建步骤。
 
 | 按键 | 作用 |
 |---|---|
